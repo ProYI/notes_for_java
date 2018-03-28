@@ -8,3 +8,4 @@
 应该也没有问题
 
 使用windows的git客户端进行上传
+通过VS code使用上传
