@@ -281,3 +281,61 @@ hibernate要手动进行事务操作，在spring中通过配置文件来配置�
     param-value是配置文件名称，写法固定 classpath：配置文件名.xml
     -->
     ```
+## 基于aspectj的注解aop
+1. 使用注解方式实现aop操作  
+    导包，引入约束  
+    两个类Book和MyBook，增强Book类中的add()方法  
+    （1） 创建对象  
+    （2） 在spring核心配置文件中，开启aop操作  
+    ```xml
+    <!-- 1.配置对象 -->
+    <bean id="book" class="me.test.aop.Book"></bean>
+    <bean id="mybook" class="me.test.aop.MyBook"></bean>
+
+    <!-- 开启aop操作 -->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+    ```
+    （3） 在增强类上面使用注解完成aop操作  
+    ```java
+    package me.test.aop;
+
+    import org.aspectj.lang.ProceedingJoinPoint;
+    import org.aspectj.lang.annotation.AfterReturning;
+    import org.aspectj.lang.annotation.Around;
+    import org.aspectj.lang.annotation.Aspect;
+    import org.aspectj.lang.annotation.Before;
+
+    @Aspect
+    public class MyBook {
+        
+        //在方法上面使用注解完成增强配置
+        @Before(value="execution(* me.test.aop.Book.*(..))")
+        public void before1() {
+            System.out.println("前置增强...");
+        }
+        
+        @AfterReturning(value="execution(* me.test.aop.Book.*(..))")
+        public void after1() {
+            System.out.println("后置增强...");
+        }
+        
+        //环绕通知
+        @Around(value="execution(* me.test.aop.Book.*(..))")
+        public void around1(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+            //方法之前执行
+            System.out.println("方法之前。。。");
+            //执行被增强方法
+            proceedingJoinPoint.proceed();
+            //方法之后执行
+            System.out.println("方法之后。。。");
+        }
+    }
+    ```
+    |AspectJ提供不同的通知类型||  
+    |:-:|:-|
+    |@Before|前置通知，相当于BeforeAdvice|  
+    |@AfterReturning|后置通知，相当于AfterReturningAdvice|  
+    |@Around|环绕通知，相当于MethodInterceptor|  
+    |@AfterThrowing|抛出通知，相当于ThrowAdvice|  
+    |@After|最终final通知，不管是否异常，该通知都会执行|  
+
