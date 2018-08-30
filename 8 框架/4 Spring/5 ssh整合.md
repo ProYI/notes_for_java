@@ -409,31 +409,31 @@
 spring整合hibernate时候，可以不写hibernate核心配置文件  
     （1）把hibernate核心配置文件中，基本信息配置和映射引入都放到spring配置  
     配置到sessionFactory下  
-    ```xml
-    <!-- sessionFactory创建交给spring管理 -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"> 
-        <!-- 如果不写hibernate核心配置文件  -->
-        <!-- hibernate基本信息配置 -->
-        <property name="hibernateproperties">
-            <props>
-                <!-- 配置数据库方言 -->
-                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
-                <!-- 输出底层sql语句 -->
-                <prop key="hibernate.show_sql">true</prop>
-                <!-- 输出底层sql语句格式化 -->
-                <prop key="hibernate.format_sql">true</prop>
-                <!-- hibernate创建表 -->
-                <prop key="hibernate.hbm2ddl.auto">update</prop>
-            </props>
-        </property>   
-        <!-- 把映射文件引入配置-->
-        <property name="mappingResources">
-            <list>
-                <value>me/test/entity/User.hbm.xml</value>
-            </list>
-        </property>
-    </bean>
-    ```
+```xml
+<!-- sessionFactory创建交给spring管理 -->
+<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"> 
+    <!-- 如果不写hibernate核心配置文件  -->
+    <!-- hibernate基本信息配置 -->
+    <property name="hibernateproperties">
+        <props>
+            <!-- 配置数据库方言 -->
+            <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+            <!-- 输出底层sql语句 -->
+            <prop key="hibernate.show_sql">true</prop>
+            <!-- 输出底层sql语句格式化 -->
+            <prop key="hibernate.format_sql">true</prop>
+            <!-- hibernate创建表 -->
+            <prop key="hibernate.hbm2ddl.auto">update</prop>
+        </props>
+    </property>   
+    <!-- 把映射文件引入配置-->
+    <property name="mappingResources">
+        <list>
+            <value>me/test/entity/User.hbm.xml</value>
+        </list>
+    </property>
+</bean>
+```
 ## Spring分模块开发
 1.  在spring里面配置多个内容，造成配置混乱，不利用维护  
 2.   把spring核心配置文件中，一部分配置放到单独的配置文件中，在spring核心配置文件中引入单独配置文件  

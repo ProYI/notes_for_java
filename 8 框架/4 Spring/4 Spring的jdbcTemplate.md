@@ -223,7 +223,7 @@ public class UserDao {
     <tx:advice id="txadvice" transaction-manager="transactionManager">
         <!-- 做事务操作 -->
         <tx:attributes>
-            <!-- 设置进行实务操作的方法匹配规则 -->
+            <!-- 设置进行事务操作的方法匹配规则 -->
             <tx:method name="accout*" propagation="REQUIRED"/>
         </tx:attributes>
     </tx:advice>
