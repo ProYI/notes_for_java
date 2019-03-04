@@ -179,3 +179,140 @@ p.red a em{...} /* class为red的p标签中的a标签中的em */
 1. `a:hover`必须置于`a:link`和`a:visited`之后，才有效  
 2. `a:active`必须置于`a:hover`之后，才有效  
 3. 伪类名称对大小写不敏感  
+## CSS继承和层叠  
+继承好处：  
+1. 父元素设置样式，子元素可以继承`部分属性`  
+2. 减少CSS代码  
+### CSS层叠  
+- 可以定义多个样式  
+- 不冲突时，多个样式可层叠为一个  
+- 冲突时，按不同样式规则优先级来应用样式  
+### CSS优先级  
+1. `id选择器` > `class选择器` > `标签选择器`  
+2. 同类样式，多次引用，样式表中后定义的优先级高（就近原则）  
+### CSS优先级规则  
+同一样式表中：  
+1. 权值相同  就近原则（离被设置元素越近，优先级越高）  
+2. 权值不同  根据权值来判断CSS样式，哪种CSS样式权值高，就使用哪种样式  
+#### 选择器权值  
+- 标签选择器：权值为1  
+- 类选择器和伪类：权值为10  
+- ID选择器：权值为100  
+- 通配符选择器：权值为0  
+- 行内样式：权值为1000 
+#### 权值规则  
+- 统计不同选择器的个数  
+- 每类选择器的个数乘以相应的权值  
+- 把所有的值相加得出选择器的权值  
+```
+#main div.warning h2 {...}
+
+id:1(#main)   class:1(.warning)  标签:2 (div h2)
+1*100           1*10                2*1
+权值 112
+```
+#### !important规则
+- 可调整样式规则的优先级  
+- 添加在样式规则之后，中间用空格隔开  
+```css
+div {color:red !important;}
+```
+### 总结  
+- !important声明高  
+- css使用方法的优先级  
+    `行内样式` > `内部样式` > `外部样式`  
+    注：link链入外部样式和style内部样式优先级，取决于先后顺序  
+- 样式表中优先级  
+    `id选择器` > `class选择器` > `标签选择器` > `通配符`  
+    <table align="center">
+        <tr bgcolor="#03A2D6" align="center">
+            <td><font color="white">权值相同</font></td>
+            <td><font color="white">权值不同</font></td>
+        </tr>
+        <tr align="center">
+            <td>就近原则</td>
+            <td>使用权值高的</td>
+        </tr>
+    </table>
+## CSS样式命名
+### CSS样式命名规则  
+- 采用英文字母、数字以及"-"和"_"命名  
+- 以小写字母开头，不能以数字和"-"、"_"开头  
+- 命名形式：单字，连字符，下划线和驼峰  
+- 使用有意义命名  
+### 常用的CSS样式命名  
+1）**页面结构**  
+<table>
+    <tr>
+        <td>页头：header</td><td></td>
+        <td>导航：nav</td><td></td>
+    </tr>
+    <tr>
+        <td>页面主体：main</td><td></td>
+        <td>侧栏：sidebar</td><td></td>
+    </tr>
+    <tr>
+        <td>页尾：footer</td><td></td>
+        <td>栏目：column</td><td></td>
+    </tr>
+    <tr>
+        <td>内容：content/container</td><td></td>
+        <td>页面外围控制：wrapper</td><td></td>
+    </tr>
+    <tr>
+        <td>容器：container</td><td></td>
+        <td>左右中：left right center</td><td></td>
+    </tr>
+</table>
+
+2）**导航**  
+<table>
+    <tr>
+        <td>导航：nav</td><td></td>
+        <td>左导航：leftsidebar</td><td></td>
+    </tr>
+    <tr>
+        <td>主导航：mainnav</td><td></td>
+        <td>右导航：rightsidebar</td><td></td>
+    </tr>
+    <tr>
+        <td>子导航：subnav</td><td></td>
+        <td>菜单：menu</td><td></td>
+    </tr>
+    <tr>
+        <td>顶导航：topnav</td><td></td>
+        <td>子菜单：submenu</td><td></td>
+    </tr>
+    <tr>
+        <td>边导航：sidebar</td><td></td>
+        <td>标题：title</td><td></td>
+    </tr>
+    <tr>
+        <td colspan="2"></td>
+        <td>摘要：summary</td><td></td>
+    </tr>
+</table>
+
+3）**功能**  
+<table>
+    <tr>
+        <td>标志：logo</td><td></td>
+        <td>注册：register</td><td></td>
+    </tr>
+    <tr>
+        <td>广告：banner</td><td></td>
+        <td>搜索：search</td><td></td>
+    </tr>
+    <tr>
+        <td>登陆：login</td><td></td>
+        <td>功能区：shop</td><td></td>
+    </tr>
+    <tr>
+        <td>登录条：loginbar</td><td></td>
+        <td>标题：title</td><td></td>
+    </tr>
+</table>
+
+### id和class使用  
+- id不要滥用，谨慎使用  
+- 适当使用class  
