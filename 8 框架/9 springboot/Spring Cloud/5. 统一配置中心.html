@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>统一配置中心</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body>
+        <h2 id="%E7%BB%9F%E4%B8%80%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83">统一配置中心</h2>
+<h3 id="%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E7%BB%9F%E4%B8%80%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83">为什么需要统一配置中心</h3>
+<ul>
+<li>不方便维护</li>
+<li>配置内容安全与权限</li>
+<li>更新配置项目需要重启</li>
+</ul>
+<p>一般配置中心会单独存放在一个git仓库中，config-server会从远端git拉取到本地git，当远端无更新或不可访问时，就可以将本地git配置信息分发给所依赖的微服务使用</p>
+<h3 id="%E5%88%9B%E5%BB%BA%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E8%BF%87%E7%A8%8B">创建配置中心过程</h3>
+<ul>
+<li>新建SpringBoot项目</li>
+<li>组件选择，EurekaClient和Config Server</li>
+<li>启动类上添加注解<code>@EnableConfigServer</code>和<code>@EnableDiscoveryClient</code></li>
+<li>配置文件<pre><code class="language-yml"><div><span class="hljs-attr">  spring:</span>
+<span class="hljs-attr">      application:</span>
+<span class="hljs-attr">          name:</span> <span class="hljs-string">config</span>
+<span class="hljs-attr">      cloud:</span>
+<span class="hljs-attr">          config:</span>
+<span class="hljs-attr">              server:</span>
+<span class="hljs-attr">                  git:</span>
+<span class="hljs-attr">                      uri:</span> <span class="hljs-attr">https://github.com/ProYI/config-repo.git</span>
+<span class="hljs-attr">                      username:</span> <span class="hljs-string">xxx</span>
+<span class="hljs-attr">                      password:</span> <span class="hljs-string">xxx</span>
+<span class="hljs-attr">                      basedir:</span> <span class="hljs-string">拉取git到的目录，可以存放在config项目目录下</span>
+<span class="hljs-attr">  eureka:</span>
+<span class="hljs-attr">      client:</span>
+<span class="hljs-attr">          service-url:</span>
+<span class="hljs-attr">              defaultZone:</span> <span class="hljs-attr">http://localhost:8761/eureka/</span>
+</div></code></pre>
+</li>
+</ul>
+<p>在config-repo中新建配置文件，比如 <code>order.yml</code>，将config项目启动在8080端口<br>
+可以通过<code>localhost:8080/order-a.yml</code>直接查看配置文件<br>
+order后必须添加 <code>-()</code>后缀，因为配置规则<br>
+<code>localhost:8080/order-a.properties</code>和<code>localhost:8080/order-a.json</code>也可以访问此配置文件，同时格式会根据相应后缀自动修改，因为config项目会进行转换</p>
+<pre><code><div>/{name}-{profiles}.yml
+/{label}/{name}-{profiles}.yml
+
+name  服务名  
+profiles 环境 (prod、dev、test)
+label  分支(branch)
+</div></code></pre>
+<h3 id="config-client">config client</h3>
+<p>所有需要使用同一配置中心中配置文件的微服务都是client端口</p>
+<ol>
+<li>引入依赖<pre><code class="language-xml"><div><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-config-server<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</div></code></pre>
+</li>
+<li>修改application.yml配置文件<pre><code class="language-yml"><div><span class="hljs-attr">spring:</span>
+<span class="hljs-attr">     application:</span>
+         <span class="hljs-comment"># 本模块在eureka上的名字</span>
+<span class="hljs-attr">         name:</span> <span class="hljs-string">Product</span>
+<span class="hljs-attr"> cloud:</span>
+<span class="hljs-attr">     config:</span>
+<span class="hljs-attr">         discovery:</span>
+<span class="hljs-attr">             enabled:</span> <span class="hljs-literal">true</span>
+             <span class="hljs-comment"># config在eureka上注册的服务名</span>
+<span class="hljs-attr">             service-id:</span> <span class="hljs-string">CONFIG</span>
+         <span class="hljs-comment"># 使用的配置环境</span>
+<span class="hljs-attr">         profile:</span> <span class="hljs-string">dev</span>
+</div></code></pre>
+</li>
+<li>application.yml重命名为bootstrap.yml</li>
+</ol>
+<p><code>bootstrap.yml</code>比<code>application.yml</code>的优先级更<code>高</code><br>
+可以先于application.yml中配置文件启动<br>
+通过bootstrap.yml中的config配置，找到配置文件，再拉取配置，最后载入application.yml中的配置</p>
+<p><strong>注意：</strong>
+一般，eureka的配置会直接写在bootstrap.yml中<br>
+因为如果eureka配置放在配置中心的话，一旦eureka server配置修改后，其他微服务使用之前配置文件去找eureka来发现config拉取配置时，无法找到eureka<br>
+无法找到后，就会去默认的端口<code>8888</code>查找，也找不到就会造成服务无法注册</p>
+<h3 id="%E6%9C%8D%E5%8A%A1%E7%AB%AF%E9%AB%98%E5%8F%AF%E7%94%A8">服务端高可用</h3>
+<p>统一配置中心一般需要做到<code>高可用</code>，不然一个节点挂掉，服务均不可使用<br>
+只需要启用多个config服务即可，config自身已实现负载均衡</p>
+<h3 id="%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD">配置文件加载</h3>
+<p>客户端配置文件时，不管选择的是<code>order-dev</code>、<code>order-prod</code>、<code>order-test</code>，其最终的配置结果都是<code>order.yml</code>和<code>order-dev/test/prod</code>的配置文件的集合<br>
+因此，既然每次都必定加载<code>order.yml</code>的配置文件，就可以在其中放入通用的配置，避免重复拷贝</p>
+<h3 id="springcloud-bus%E8%87%AA%E5%8A%A8%E5%88%B7%E6%96%B0%E9%85%8D%E7%BD%AE">SpringCloud Bus自动刷新配置</h3>
+<p>远端仓库通过<code>bus-refresh</code>刷新远端git仓库到config-server，然后config-server通过<code>消息队列</code>来通知某个微服务的配置文件已经发生变化，微服务消费消息后即可更新配置<br>
+<img src="file:////Users/pengchen/document/git/notes_for_java/8 框架/9 springboot/Spring Cloud/SpringCloud%20Bus%E7%9A%84%E4%BD%9C%E7%94%A8.png" alt="SpringCloud Bus的作用"></p>
+<ol>
+<li>Spring Config项目引入SpringCloud Bus的依赖<pre><code class="language-xml"><div><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span>
+     <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.springframework.cloud<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span>
+     <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>spring-cloud-starter-bus-amqp<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span>
+ <span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span>
+</div></code></pre>
+</li>
+<li>修改Config配置文件<pre><code class="language-yml"><div><span class="hljs-attr">management:</span>
+<span class="hljs-attr"> endpoints:</span>
+<span class="hljs-attr">   web:</span>
+<span class="hljs-attr">     cors:</span>
+       <span class="hljs-comment"># 把对应的接口暴露出去</span>
+<span class="hljs-attr">       exposed-headers:</span> <span class="hljs-string">"*"</span>
+</div></code></pre>
+</li>
+<li>相应的微服务的pom中也引入该依赖</li>
+<li>在使用过配置文件的地方加入<code>@RefreshScope</code></li>
+<li>在git远端仓库添加webhook，url为<code>config项目部署的公网地址/monitor</code>，Content type为<code>application/json</code></li>
+</ol>
+
+    </body>
+    </html>
