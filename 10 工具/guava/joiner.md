@@ -1,4 +1,4 @@
-### joiner方法的使用
+### joiner的使用
 
 joiner是guava中操作字符拼接的工具类，下面是常用的测试方法
 
